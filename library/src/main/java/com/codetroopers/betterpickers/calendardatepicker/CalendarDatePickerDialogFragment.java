@@ -47,6 +47,7 @@ import com.nineoldandroids.animation.ObjectAnimator;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -54,7 +55,7 @@ import java.util.Locale;
 /**
  * Dialog allowing users to select a date.
  */
-public class CalendarDatePickerDialogFragment extends DialogFragment implements OnClickListener, CalendarDatePickerController {
+public class CalendarDatePickerDialogFragment extends DialogFragment implements OnClickListener, CalendarDatePickerController, YearChooseLayout.YearClickListener {
 
     private static final String TAG = "DatePickerDialog";
 
@@ -96,6 +97,7 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
     private TextView mSelectedMonthTextView;
     private TextView mSelectedDayTextView;
     private TextView mYearView;
+    private YearChooseLayout mYearView2;
     private DayPickerView mDayPickerView;
     private YearPickerView mYearPickerView;
 
@@ -278,6 +280,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mSelectedDayTextView = (TextView) view.findViewById(R.id.date_picker_day);
         mYearView = (TextView) view.findViewById(R.id.date_picker_year);
         mYearView.setOnClickListener(this);
+        mYearView2 = (YearChooseLayout) view.findViewById(R.id.date_picker_year_2);
+        mYearView2.setOnClickBackListener(this);
 
         int listPosition = -1;
         int listPositionOffset = 0;
@@ -303,8 +307,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mSelectDay = res.getString(R.string.select_day);
         mYearPickerDescription = res.getString(R.string.year_picker_description);
         mSelectYear = res.getString(R.string.select_year);
-        mSelectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor, R.color.bpBlue);
-        mUnselectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, R.color.numbers_text_color);
+        mSelectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpAccentColor, getResources().getColor(R.color.bpBlue));
+        mUnselectedColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainTextColor, getResources().getColor(R.color.numbers_text_color));
 
         mAnimator = (AccessibleDateAnimator) view.findViewById(R.id.animator);
         mAnimator.addView(mDayPickerView);
@@ -364,9 +368,9 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
 
         mHapticFeedbackController = new HapticFeedbackController(activity);
 
-        int mainColor1 = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor1, R.color.bpWhite);
-        int mainColor2 = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor2, R.color.circle_background);
-        int backgroundColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpLineColor, R.color.bpWhite);
+        int mainColor1 = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor1, getResources().getColor(R.color.bpWhite));
+        int mainColor2 = themeColors.getColor(R.styleable.BetterPickersDialog_bpMainColor2, getResources().getColor(R.color.circle_background));
+        int backgroundColor = themeColors.getColor(R.styleable.BetterPickersDialog_bpLineColor, getResources().getColor(R.color.bpWhite));
 
         mDayPickerView.setTheme(themeColors);
         mYearPickerView.setTheme(themeColors);
@@ -458,7 +462,9 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         mSelectedMonthTextView.setText(mCalendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
                 Locale.getDefault()).toUpperCase(Locale.getDefault()));
         mSelectedDayTextView.setText(DAY_FORMAT.format(mCalendar.getTime()));
-        mYearView.setText(YEAR_FORMAT.format(mCalendar.getTime()));
+        String yearText = YEAR_FORMAT.format(mCalendar.getTime());
+        mYearView.setText(yearText);
+        mYearView2.setYearText(yearText);
 
         // Accessibility.
         long millis = mCalendar.getTimeInMillis();
@@ -569,6 +575,22 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         }
     }
 
+
+    @Override
+    public void yearClick() {
+        setCurrentView(YEAR_VIEW);
+    }
+    @Override
+    public void yearChoose(int ADorBC,int year) {
+        setDateRange(new CalendarDay(year-20,Calendar.JANUARY, 1),new CalendarDay(year+20,Calendar.DECEMBER, 31));
+        mCalendar.set(Calendar.ERA,ADorBC);
+        mCalendar.set(Calendar.YEAR, year);
+        adjustDayInMonthIfNeeded(mCalendar.get(Calendar.MONTH), year);
+        updatePickers();
+        setCurrentView(MONTH_AND_DAY_VIEW);
+        updateDisplay(true);
+    }
+
     @Override
     public void onYearSelected(int year) {
         adjustDayInMonthIfNeeded(mCalendar.get(Calendar.MONTH), year);
@@ -576,6 +598,8 @@ public class CalendarDatePickerDialogFragment extends DialogFragment implements 
         updatePickers();
         setCurrentView(MONTH_AND_DAY_VIEW);
         updateDisplay(true);
+        mYearView2.setYearText(year);
+
     }
 
     @Override

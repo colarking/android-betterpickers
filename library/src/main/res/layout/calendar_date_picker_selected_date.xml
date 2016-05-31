@@ -70,4 +70,8 @@
         android:textSize="@dimen/selected_date_year_size"
         tools:text="1970"/>
 
+    <com.codetroopers.betterpickers.calendardatepicker.YearChooseLayout
+        android:layout_width="match_parent"
+        android:id="@+id/date_picker_year_2"
+        android:layout_height="wrap_content" />
 </LinearLayout>

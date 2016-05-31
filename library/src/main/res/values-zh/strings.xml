@@ -24,6 +24,9 @@
     <string name="month_c">月</string>
     <string name="day_c">天</string>
     <string name="year_c">年</string>
+    <string name="year_bc">公元前</string>
+    <string name="year_ad">公  元</string>
+    <string name="year_change">修改年份</string>
 
     <!-- 1.3.1 -->
     <string name="min_error">请输入一个数字大于或等于 %1$s</string>

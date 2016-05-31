@@ -52,4 +52,7 @@
 
     <color name="recurrence_picker_background">#fff2f2f2</color>
     <color name="recurrence_bubble_text_normal">#ff737373</color>
+    <drawable name="transparent">#00000000</drawable>
+    <color name="blue">#33b5e5</color>
+    <color name="red">#ff3333</color>
 </resources>
